@@ -1,0 +1,23 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <h1>System Login</h1>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{form.as_p}}
+                    <button type="submit" class="btn btn-success">Login</button>
+                </form>
+                <br>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
