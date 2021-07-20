@@ -15,6 +15,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=50)
     last_login = models.DateTimeField(auto_now_add=False, null=True)
     updated_on = models.DateTimeField(auto_now_add=True)
+    designation = models.CharField(max_length=50, blank=True)
+    department = models.CharField(max_length=50, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

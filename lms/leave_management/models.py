@@ -33,7 +33,7 @@ class Work_week_plan(models.Model):
 
 class My_leave_balance(models.Model):
     leave_name = models.ForeignKey(Leave_type, related_name="leavename", on_delete=models.CASCADE)
-    leave_remaining = models.IntegerField(blank=True , default=0)
+    leave_remaining = models.FloatField(blank=True , default=0)
     created_by = models.ForeignKey(User, related_name='createdby', on_delete=models.CASCADE, null=True)
 
 
@@ -42,7 +42,7 @@ class Leave_form(models.Model):
     employee_name = models.CharField(max_length=100)
     application_date = models.DateField(auto_now_add=False, blank=True)
     leave_type = models.ForeignKey(Leave_type, related_name="leave_t", on_delete=models.CASCADE)
-    remaining_leave = models.IntegerField(blank=True, null=True)
+    remaining_leave = models.FloatField(blank=True, null=True)
     from_date = models.DateField(auto_now_add=False, blank=True)
     till_date = models.DateField(auto_now_add=False, blank=True)
     total_taken_leave = models.CharField(max_length=100, null=True, blank=True)

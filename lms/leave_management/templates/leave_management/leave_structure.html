@@ -83,7 +83,7 @@ body {font-family: Arial;}
               <div class="form-group row" style="padding-left:20px; padding-right:20px;">
                 <div class="col-sm-6">
                 	{% csrf_token %}
-					 <!-- Tab links -->
+					 <!-- Tab links inside add leave -->
 					<div class="tab">
 					  <button type="button" class="tablinks" onclick="openCity(event, 'leave_type')">Leave Type</button>
 					  <button type="button" class="tablinks" onclick="openCity(event, 'holiday')">Holiday</button>
@@ -296,7 +296,7 @@ input:checked + .slider:before {
 </style>
 <!--	Tabs for table -->
 	<div class="tab">
-	  <button type="button" class="tab" onclick="openTab(event, 'leave_type_table')">Leave Type</button>
+	  <button type="button" class="tab active" onclick="openTab(event, 'leave_type_table')" id="defaultOpen">Leave Type</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'holiday_table')">Holiday</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'work_week_table')">Work Week</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'leave_policy_table')">Leave Policy</button>
@@ -461,6 +461,7 @@ function openTab(evt, Name) {
   document.getElementById(Name).style.display = "block";
   evt.currentTarget.className += " active";
 }
+document.getElementById("defaultOpen").click();
 
 </script>
 

@@ -8,6 +8,9 @@ from datetime import date,  timedelta
 from django.db.models import Q
 from django.http import JsonResponse
 import pandas as pd
+from common.models import User
+from django.contrib.auth.hashers import make_password
+
 
 
 
@@ -17,7 +20,7 @@ import pandas as pd
 
 
 # Create your views here.
-
+@login_required
 def index(request):
     return render(request, 'leave_management/index.html')
 
@@ -28,8 +31,9 @@ def dashboard(request):
 
 
  
-
+@login_required
 def leave_form(request):
+
     leave_type = Leave_type.objects.filter(typeleave='Leave type').distinct()
 
     leave = My_leave_balance.objects.filter(created_by = request.user.id).values_list('leave_name','leave_remaining')
@@ -40,8 +44,10 @@ def leave_form(request):
     holiday_list = []
     holiday = Leave_type.objects.filter(typeleave='Holiday')
     for i in holiday:
-        date_str = str(i.date)
+        date = str(i.date)
+        date_str = datetime.strptime(date, "%Y-%m-%d").strftime("%#d-%#m-%Y")
         holiday_list.append(date_str)
+        print(holiday_list)
 
 
 
@@ -53,10 +59,10 @@ def leave_form(request):
         leave_formobj.application_date  = request.POST.get('current_date')
         leave_formobj.leave_type_id     = request.POST.get('leave_type')
         leave_formobj.remaining_leave   = request.POST.get('remaining_leave')
-        date_from                       = request.POST.get('from_date')
-        leave_formobj.from_date         = datetime.strptime(date_from, "%m/%d/%Y").strftime("%Y-%m-%d")
-        date_till                       = request.POST.get('till_date')
-        leave_formobj.till_date         = datetime.strptime(date_till, "%m/%d/%Y").strftime("%Y-%m-%d")
+        f_date                          = request.POST.get('from_date')
+        leave_formobj.from_date         = datetime.strptime(f_date, "%d-%m-%Y").strftime("%Y-%m-%d")
+        t_date                          = request.POST.get('till_date')
+        leave_formobj.till_date         = datetime.strptime(t_date, "%d-%m-%Y").strftime("%Y-%m-%d")
         leave_formobj.day               = request.POST.get('day')
         leave_formobj.total_taken_leave = request.POST.get('total_taken_leave')
         leave_formobj.remark            = request.POST.get('remark')
@@ -68,7 +74,7 @@ def leave_form(request):
     else:
         return render(request,'leave_management/leave_form.html',{'leave_type':leave_type,'leave_dict':leave_dict,'holiday_list':holiday_list})
 
-
+@login_required
 def my_leave_record(request):
     # date =datetime.now().strftime('%F %d,%Y,')
     # time = datetime.now().strftime('%H')
@@ -99,12 +105,17 @@ def my_leave_record(request):
 
             return render(request,'leave_management/my_leave_record.html', {'leave_form':leave_form,'leave_type':leave_type})
 
-    leave_form = Leave_form.objects.all().order_by('-application_date')
+    if request.user.role == 'Employee':
+        leave_form = Leave_form.objects.filter(created_by=request.user.id).order_by('-application_date')
+    else:
+        leave_form = Leave_form.objects.filter(created_by=request.user.id).order_by('-application_date')
+
+
     final_status = Leave_form.objects.filter(id=request.POST.get('withdraw')).first()
 
     if request.method == 'POST':
         get_leave_type = Leave_type.objects.filter(id=final_status.leave_type.id).first()
-        remaining_leave = int(final_status.remaining_leave) + int(final_status.total_taken_leave)
+        remaining_leave = float(final_status.remaining_leave) + float(final_status.total_taken_leave)
         my_leave_balanceobj = My_leave_balance.objects.filter(leave_name=get_leave_type.id).first()
 
         final_status.status = 'Withdraw'
@@ -121,7 +132,7 @@ def my_leave_record(request):
 
     return render(request,'leave_management/my_leave_record.html', {'leave_form':leave_form,'date':date,'leave_type':leave_type})
 
-
+@login_required
 def extend_leave(request,pk):
     extend_leave = Leave_form.objects.filter(id=pk).first()
     data = {'extend_leave': extend_leave}
@@ -150,6 +161,7 @@ def extend_leave(request,pk):
 
     return render(request, 'leave_management/extend_leave.html',data)
 
+@login_required
 def extend_approved_leave(request,pk):
     extend_approved_leave = Leave_form.objects.filter(id=pk).first()
     data = {'extend_approved_leave': extend_approved_leave}
@@ -183,7 +195,7 @@ def extend_approved_leave(request,pk):
 
     return render(request,'leave_management/extend_approved_leave.html',data)
 
-
+@login_required
 def leave_structure(request):
 
     leave_type   = Leave_type.objects.filter(typeleave = 'Leave type')
@@ -243,6 +255,7 @@ def leave_structure(request):
     else:
         return render(request, 'leave_management/leave_structure.html', {'leave_type':leave_type, 'holiday':holiday, 'work_week':work_week,'leave_policy':leave_policy})
 
+@login_required
 def edit_leave_type(request,pk):
 
     leave_type = Leave_type.objects.filter(id=pk).first()
@@ -263,11 +276,12 @@ def edit_leave_type(request,pk):
 
     return render(request,'leave_management/edit_leave_type.html', data)
 
+@login_required
 def delete_leave_type(request,pk):
     leave_type = Leave_type.objects.filter(id=pk).delete()
     return redirect('leave_management:leave_structure')
 
-
+@login_required
 def edit_holiday(request, pk):
     holiday = Leave_type.objects.filter(id=pk).first()
     data = {'holiday':holiday}
@@ -283,11 +297,12 @@ def edit_holiday(request, pk):
 
     return render(request,'leave_management/edit_holiday.html', data)
 
-
+@login_required
 def delete_holiday(request,pk):
     leave_type = Leave_type.objects.filter(id=pk).delete()
     return redirect('leave_management:leave_structure')
 
+@login_required
 def edit_work_week(request,pk):
     if request.method == 'POST':
         work_week = Work_week_plan.objects.filter(id = pk).first()
@@ -302,13 +317,13 @@ def edit_work_week(request,pk):
 
         return redirect('leave_management:leave_structure')
 
-
+@login_required
 def delete_work_week(request,pk):
     work_week = Work_week_plan.objects.filter(id=pk).delete()
     return redirect('leave_management:leave_structure')
 
 
-
+@login_required
 def my_leave_balance(request):
     leave_type = Leave_type.objects.filter(typeleave='Leave type')
     leave_balance = My_leave_balance.objects.filter(created_by = request.user.id)
@@ -317,17 +332,22 @@ def my_leave_balance(request):
 
 
 
-
+@login_required
 def leave_request(request):
 
-    leave_form = Leave_form.objects.all().order_by('-application_date')
+
+    leave_form = Leave_form.objects.filter(created_by__role='Employee').order_by('-application_date')
     final_status = Leave_form.objects.filter(id = request.POST.get('approval')).first()
+    print(final_status)
+
 
     if request.method == 'POST':
         get_leave_type = Leave_type.objects.filter(id=final_status.leave_type.id).first()
-        remaining_leave = int(final_status.remaining_leave) - int(final_status.total_taken_leave)
+        remaining_leave = float(final_status.remaining_leave) - float(final_status.total_taken_leave)
+
         my_leave_balanceobj = My_leave_balance.objects.filter(leave_name = get_leave_type.id, created_by = request.user.id).first()
-        if final_status.status == 'Approved':
+
+        if final_status.status == 'Approved' or final_status.status == 'Withdraw':
             print('hello')
         else:
             if request.POST.get('status')=='Approve':
@@ -349,7 +369,7 @@ def leave_request(request):
 
             elif request.POST.get('status')=='Reject':
                 if final_status.status == 'Approved':
-                    remaining_leave = int(final_status.remaining_leave) + int(final_status.total_taken_leave)
+                    remaining_leave =  float(final_status.remaining_leave) +  float(final_status.total_taken_leave)
                     my_leave_balanceobj = My_leave_balance.objects.filter(leave_name=get_leave_type.id).first()
                     final_status.status = 'Rejected'
                     final_status.remaining_leave = remaining_leave
@@ -367,6 +387,7 @@ def leave_request(request):
             return redirect('leave_management:leave_request')
     return render(request, 'leave_management/leave_request.html',{'leave_form':leave_form})
 
+@login_required
 def ajax_posting(request):
     date1 = request.POST.get('date1', None)
     date2 = request.POST.get('date2', None)
@@ -404,34 +425,37 @@ def ajax_posting(request):
     return JsonResponse(response)
 
 
-def ajax_extend_leave(request):
-    date1 = request.POST.get('date1', None)
-    date2 = request.POST.get('date2', None)
+@login_required
+def all_employee_leave_record(request):
 
-    sdate = datetime.strptime(date1, '%Y-%m-%d')
-    edate = datetime.strptime(date2, '%Y-%m-%d')
+    leave_form = Leave_form.objects.filter(created_by__role='Employee').order_by('-application_date') 
+    print(leave_form)
 
-    delta = edate - sdate
+    return render(request,'leave_management/all_employee_leave_record.html',{'leave_form':leave_form})
 
-    dates = []
-    for i in range(delta.days + 1):
-        day = sdate + timedelta(days=i)
-        dates.append(day.strftime('%Y-%m-%d'))
+@login_required
+def account(request):
 
+    if request.method == 'POST':
+        userobj = User()
+        userobj.username   = request.POST.get('user_name')
+        userobj.first_name  = request.POST.get('first_name')
+        userobj.last_name   = request.POST.get('last_name')
+        userobj.email       = request.POST.get('email')
+        plain_password      = request.POST.get('password')
+        userobj.password    = make_password(plain_password)
+        userobj.role        = request.POST.get('role')
+        userobj.designation = request.POST.get('designation')
+        userobj.save()
+        return redirect('leave_management:account')
+    else:
+        return render(request,'leave_management/account.html')
 
-    leave_date = []
-    leave = Leave_form.objects.filter()
-    print(leave)
-    for i in leave:
-        date_str = str(i.from_date)
-        leave_date.append(date_str)
-
-
-
-    count = 0
-
-    response = {
-        'count': count
-    }
-    return JsonResponse(response)
+@login_required
+def employee_leave_structure(request):
+    leave_type = Leave_type.objects.filter(typeleave='Leave type')
+    holiday = Leave_type.objects.filter(typeleave='Holiday')
+    work_week = Work_week_plan.objects.all()
+    leave_policy = Leave_policy.objects.all()
+    return render(request, 'leave_management/employee_leave_structure.html',{'leave_type': leave_type, 'holiday': holiday, 'work_week': work_week, 'leave_policy': leave_policy})
 

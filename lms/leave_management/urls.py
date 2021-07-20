@@ -12,6 +12,7 @@ urlpatterns = [
     path('my_leave_record/<int:pk>/extend_leave', views.extend_leave, name='extend_leave'),
     path('my_leave_record/<int:pk>/extend_approved_leave', views.extend_approved_leave, name='extend_approved_leave'),
     path('leave_structure/', views.leave_structure, name='leave_structure'),
+    path('employee_leave_structure/', views.employee_leave_structure, name='employee_leave_structure'),
 
 
     path('leave_structure/<int:pk>/edit_leave_type/', views.edit_leave_type, name='edit_leave_type'),
@@ -24,7 +25,9 @@ urlpatterns = [
     path('my_leave_balance/', views.my_leave_balance, name='my_leave_balance'),
     path('leave_request/', views.leave_request, name='leave_request'),
     path('ajax-posting/', views.ajax_posting, name='ajax_posting'),
-    path('ajax_extend_leave/', views.ajax_extend_leave, name='ajax_extend_leave'),
+
+    path('all_employee_leave_record/',views.all_employee_leave_record, name='all_employee_leave_record'),
+    path('account/', views.account, name='account'),
    
 
 ]

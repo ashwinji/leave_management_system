@@ -159,13 +159,13 @@ input:checked + .slider:before {
 </style>
 <!--	Tabs for table -->
 	<div class="tab">
-	  <button type="button" class="tab" onclick="openTab(event, 'leave_type_table')">Leave Type</button>
+	  <button type="button" class="tab  " onclick="openTab(event, 'leave_type_table')" >Leave Type</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'holiday_table')">Holiday</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'work_week_table')">Work Week</button>
 	  <button type="button" class="tab" onclick="openTab(event, 'leave_policy_table')">Leave Policy</button>
 	</div>
 
-	<div id="leave_type_table" class="tabcontent">
+	<div id="leave_type_table" class="tabcontent" style ='display:block;'>
 <!--            <p>Leave Type</p>-->
             <div class="tableFixHead ">
 				<table class="table table-striped table-responsive-md btn-table">
@@ -261,23 +261,6 @@ document.getElementById("date").value = today.getFullYear() + '-' + ('0' + (toda
 
 
 
-<!--Script for tab inside Add leave type-->
-<script>
-function openCity(evt, Name) {
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-  document.getElementById(Name).style.display = "block";
-  evt.currentTarget.className += " active";
-}
-
-</script>
 
 <!--Script for tab for tables-->
 <script>

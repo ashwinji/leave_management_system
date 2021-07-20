@@ -26,25 +26,25 @@
   <div class="form-row">
     <div class="col-md-3 mb-3">
       <label for="validationCustom01">Employee name</label>
-      <input type="text" class="form-control" name="employee_name" id="employee_name" placeholder="Employee Name" value="{{extend_leave.employee_name}}" required>
+      <input type="text" class="form-control" name="employee_name" id="employee_name" placeholder="Employee Name" value="{{request.user.first_name}} {{request.user.last_name}}" required readonly>
 
     </div>
       <div class="col-md-3 mb-3">
       <label for="date">Application Date</label>
-      <input   class="form-control" id="current_Date" name="current_date" >
+      <input   class="form-control" id="current_Date" name="current_date" readonly>
       </div>
     </div>
 
   <div class="form-row">
     <div class="col-md-3 mb-3">
       <label for="leave_type">Leave Type :</label>
-      <input  class="form-control" value="{{extend_leave.leave_type.leave_name}}">
-      <input type="hidden"  id="leave_type" name="leave_type" class="form-control"  value="{{extend_leave.leave_type_id}}">
+      <input  class="form-control" value="{{extend_leave.leave_type.leave_name}}" readonly>
+      <input type="hidden"  id="leave_type" name="leave_type" class="form-control"  value="{{extend_leave.leave_type_id}}"  >
 
     </div>
     <div class="col-md-3 mb-3">
       <label for="remaining_leave">Remaining Leave</label>
-      <input type="text" class="form-control" name="remaining_leave" id="remaining_leave" placeholder="Remaining Leave" value="{{extend_leave.remaining_leave}}">
+      <input type="text" class="form-control" name="remaining_leave" id="remaining_leave" placeholder="Remaining Leave" value="{{extend_leave.remaining_leave}}" readonly>
      </div>
   </div>
 
@@ -72,7 +72,7 @@
        <label for="full_day">Full Day :</label>
        <input type="radio"  name="day" id="full_day" value="1">
        <label for="half_day">Half Day :</label>
-       <input type="radio"  name="day" id="half_day" value="0.5">
+       <input type="radio"  name="day" id="half_day" onclick="myFunction();>
    </div>
 
 
@@ -222,5 +222,15 @@ if (leaveval == {{key}}) {
 };
 </script>
 
+<!--Script for Half day leave-->
+<script>
+    function myFunction() {
+          var day = document.getElementById("total_taken_leave").value ;
+          var half_day_minus = day-(0.5);
+
+          document.getElementById("result").innerHTML = half_day_minus ;
+          document.getElementById("total_taken_leave").value = half_day_minus ;
+    }
+</script>
 
 {% endblock %}

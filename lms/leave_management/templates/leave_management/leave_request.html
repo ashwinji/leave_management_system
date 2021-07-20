@@ -91,9 +91,10 @@
 					</thead>
 					<tbody>
 						{% for i in leave_form %}
+
 						<tr>
 							<td>{{i.employee_name}}</td>
-							<td>{{i.leave_per_year}}</td>
+							<td>{{j.designation}}</td>
 							<td>{{i.leave_type.leave_name}}</td>
 							<td>{{i.application_date}}</td>
 							<td>{{i.from_date}}</td>
